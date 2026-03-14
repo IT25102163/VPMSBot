@@ -23,7 +23,7 @@ import java.sql.DriverManager;
 
             } catch (Exception e) {
                 // Print error to console if connection fails
-                System.out.println("❌ Database connection failed: " + e.getMessage());
+                System.out.println("Database connection failed: " + e.getMessage());
                 e.printStackTrace();
                 return null;
             }
