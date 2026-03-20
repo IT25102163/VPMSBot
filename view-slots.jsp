@@ -62,7 +62,6 @@
   <thead>
   <tr>
     <th>Slot No</th>
-    <th>Floor</th>
     <th>Type</th>
     <th>Status</th>
     <th>Actions</th>
@@ -74,9 +73,9 @@
 
 <script>
   let slots = [
-    {slotNo: "A1", floor: 1, type: "Car", status: "Available"},
-    {slotNo: "B2", floor: 1, type: "Bike", status: "Occupied"},
-    {slotNo: "C3", floor: 2, type: "Truck", status: "Reserved"}
+    {slotNo: "A1", type: "Car", status: "Available"},
+    {slotNo: "B2", type: "Bike", status: "Occupied"},
+    {slotNo: "C3", type: "Truck", status: "Reserved"}
   ];
 
   function loadTable() {
@@ -87,7 +86,6 @@
       let row = `
                 <tr>
                     <td>${slot.slotNo}</td>
-                    <td>${slot.floor}</td>
                     <td>${slot.type}</td>
                     <td>${slot.status}</td>
                     <td>
