@@ -29,7 +29,7 @@
             font-weight: bold;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 8px;
             margin: 8px 0 15px 0;
@@ -70,18 +70,7 @@
         <input type="text" id="slotNumber" required>
 
         <label>Slot Type</label>
-        <select id="slotType">
-            <option value="Car">Car</option>
-            <option value="Bike">Bike</option>
-            <option value="Truck">Truck</option>
-        </select>
-
-        <label>Status</label>
-        <select id="slotStatus">
-            <option value="Available">Available</option>
-            <option value="Reserved">Reserved</option>
-            <option value="Occupied">Occupied</option>
-        </select>
+        <input type="text" id="slotType" placeholder="Enter type (Car/Bike/Truck)" required>
 
         <button type="submit">Add Slot</button>
     </form>
@@ -95,7 +84,6 @@
 
         let slotNumber = document.getElementById("slotNumber").value;
         let slotType = document.getElementById("slotType").value;
-        let slotStatus = document.getElementById("slotStatus").value;
 
         // Show success message
         document.getElementById("message").innerText =
@@ -103,8 +91,7 @@
 
         console.log("Slot Data:", {
             slotNumber,
-            slotType,
-            slotStatus
+            slotType
         });
 
         document.getElementById("slotForm").reset();
