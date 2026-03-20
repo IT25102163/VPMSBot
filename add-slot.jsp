@@ -69,9 +69,6 @@
         <label>Slot Number</label>
         <input type="text" id="slotNumber" required>
 
-        <label>Floor Number</label>
-        <input type="number" id="floorNumber" required>
-
         <label>Slot Type</label>
         <select id="slotType">
             <option value="Car">Car</option>
@@ -97,17 +94,15 @@
         event.preventDefault();
 
         let slotNumber = document.getElementById("slotNumber").value;
-        let floorNumber = document.getElementById("floorNumber").value;
         let slotType = document.getElementById("slotType").value;
         let slotStatus = document.getElementById("slotStatus").value;
 
-        // For now just showing success message
+        // Show success message
         document.getElementById("message").innerText =
             "Slot " + slotNumber + " added successfully!";
 
         console.log("Slot Data:", {
             slotNumber,
-            floorNumber,
             slotType,
             slotStatus
         });
