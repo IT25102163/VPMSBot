@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ParkSecure – Security & Access Control</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-dark: #070d1a;
+    --bg-panel: #0b1628;
+    --bg-card: #0f1e35;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --grid: rgba(0,229,255,0.04);
+    --border: rgba(0,229,255,0.15);
+    --text: #cde4f5;
+    --text-muted: #5a7a9a;
+    --danger: #ff3b5c;
+    --success: #39ff14;
+    --warning: #ffd700;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Exo 2', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ─── Scanline overlay ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: linear-gradient(90deg, #070d1a 0%, #0a1830 50%, #070d1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 0 30px rgba(0,229,255,0.07);
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), #0066ff);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+    animation: pulse-icon 3s ease-in-out infinite;
+  }
+  @keyframes pulse-icon {
+    0%,100%{ box-shadow: 0 0 0 0 rgba(0,229,255,0.4); }
+    50%{ box-shadow: 0 0 0 8px rgba(0,229,255,0); }
+  }
+  .brand-name { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: #fff; letter-spacing: 2px; }
+  .brand-sub { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; }
+  .header-nav { display: flex; gap: 6px; }
+  .nav-pill {
+    font-family: var(--font-mono); font-size: 0.72rem; padding: 6px 14px;
+    border: 1px solid var(--border); border-radius: 2px; color: var(--text-muted);
+    background: transparent; cursor: pointer; transition: all .2s; letter-spacing: 1px;
+    text-decoration: none;
+  }
+  .nav-pill.active, .nav-pill:hover { color: var(--accent); border-color: var(--accent); background: rgba(0,229,255,0.06); }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent3);
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
+
+  /* ─── Main layout ─── */
+  .main-wrap { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 64px); }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .sidebar-section-label {
+    font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+    letter-spacing: 3px; padding: 12px 8px 6px; text-transform: uppercase;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 4px; cursor: pointer;
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 500;
+    color: var(--text-muted); border: 1px solid transparent; transition: all .2s;
+    background: transparent;
+  }
+  .sidebar-item i { font-size: 1rem; width: 20px; text-align: center; }
+  .sidebar-item:hover { color: var(--text); background: rgba(255,255,255,0.03); border-color: var(--border); }
+  .sidebar-item.active { color: var(--accent); background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.2); }
+  .sidebar-item.active i { color: var(--accent); }
+  .sidebar-badge {
+    margin-left: auto; font-family: var(--font-mono); font-size: 0.65rem;
+    background: var(--accent2); color: #fff; padding: 2px 7px; border-radius: 20px;
+  }
+  .sidebar-badge.green { background: var(--success); color: #000; }
+
+  /* ─── Content ─── */
+  .content { padding: 2rem; overflow-y: auto; }
+
+  /* ─── Section titles ─── */
+  .section-title {
+    font-family: var(--font-head); font-size: 1.8rem; font-weight: 700;
+    color: #fff; letter-spacing: 2px; margin-bottom: 4px;
+  }
+  .section-title span { color: var(--accent); }
+  .section-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 1.5rem; }
+
+  /* ─── Cards ─── */
+  .glass-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative; overflow: hidden;
+    transition: border-color .3s;
+  }
+  .glass-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity .3s;
+  }
+  .glass-card:hover { border-color: rgba(0,229,255,0.3); }
+  .glass-card:hover::before { opacity: 1; }
+
+  .card-label {
+    font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+    letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .card-value {
+    font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; color: #fff;
+  }
+  .card-value.accent { color: var(--accent); }
+  .card-value.green { color: var(--success); }
+  .card-value.danger { color: var(--danger); }
+  .card-value.warning { color: var(--warning); }
+
+  /* ─── Divider ─── */
+  .cyber-divider {
+    height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 1.5rem 0;
+  }
+
+  /* ─── Mode toggle ─── */
+  .mode-toggle-wrap {
+    display: flex; gap: 0; border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+    margin-bottom: 1.5rem; width: fit-content;
+  }
+  .mode-btn {
+    padding: 10px 28px; font-family: var(--font-head); font-size: 1rem; font-weight: 600;
+    letter-spacing: 1px; background: transparent; color: var(--text-muted);
+    border: none; cursor: pointer; transition: all .25s;
+  }
+  .mode-btn.active { background: var(--accent); color: #000; }
+  .mode-btn:not(.active):hover { background: rgba(0,229,255,0.08); color: var(--accent); }
+
+  /* ─── Form elements ─── */
+  .form-label-cyber {
+    font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block;
+  }
+  .input-cyber {
+    width: 100%; background: rgba(0,229,255,0.03); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--font-mono); font-size: 0.9rem; padding: 10px 14px;
+    border-radius: 3px; outline: none; transition: all .2s;
+  }
+  .input-cyber:focus { border-color: var(--accent); background: rgba(0,229,255,0.07); box-shadow: 0 0 0 3px rgba(0,229,255,0.08); }
+  .input-cyber::placeholder { color: var(--text-muted); font-size: 0.8rem; }
+  select.input-cyber option { background: var(--bg-card); }
+
+  /* ─── Buttons ─── */
+  .btn-cyber {
+    font-family: var(--font-head); font-size: 1rem; font-weight: 600; letter-spacing: 2px;
+    padding: 11px 28px; border: none; border-radius: 3px; cursor: pointer; transition: all .25s;
+    text-transform: uppercase; position: relative; overflow: hidden;
+  }
+  .btn-cyber::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0; transition: opacity .2s;
+  }
+  .btn-cyber:hover::after { opacity: 1; }
+  .btn-primary-cyber { background: var(--accent); color: #000; }
+  .btn-primary-cyber:hover { background: #00c4dd; box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+  .btn-secondary-cyber { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn-secondary-cyber:hover { background: rgba(0,229,255,0.1); }
+  .btn-danger-cyber { background: var(--danger); color: #fff; }
+  .btn-danger-cyber:hover { background: #e0003d; box-shadow: 0 0 20px rgba(255,59,92,0.4); }
+  .btn-success-cyber { background: var(--success); color: #000; }
+  .btn-success-cyber:hover { box-shadow: 0 0 20px rgba(57,255,20,0.4); }
+
+  /* ─── Alert box ─── */
+  .alert-cyber {
+    border-radius: 3px; padding: 14px 16px; font-family: var(--font-mono);
+    font-size: 0.82rem; border-left: 3px solid; margin-top: 12px;
+    display: none; animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+  .alert-cyber.success { background: rgba(57,255,20,0.08); border-color: var(--success); color: var(--success); }
+  .alert-cyber.error   { background: rgba(255,59,92,0.08); border-color: var(--danger); color: var(--danger); }
+  .alert-cyber.info    { background: rgba(0,229,255,0.08); border-color: var(--accent); color: var(--accent); }
+  .alert-cyber.warning { background: rgba(255,215,0,0.08); border-color: var(--warning); color: var(--warning); }
+
+  /* ─── Table ─── */
+  .table-cyber { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
+  .table-cyber thead tr { border-bottom: 1px solid var(--accent); }
+  .table-cyber th {
+    padding: 10px 14px; text-align: left; font-size: 0.65rem; letter-spacing: 2px;
+    color: var(--accent); text-transform: uppercase; font-weight: 500;
+  }
+  .table-cyber tbody tr {
+    border-bottom: 1px solid rgba(0,229,255,0.05);
+    transition: background .15s;
+  }
+  .table-cyber tbody tr:hover { background: rgba(0,229,255,0.04); }
+  .table-cyber td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
+  .status-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 2px;
+    font-size: 0.65rem; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;
+  }
+  .status-in  { background: rgba(57,255,20,0.15); color: var(--success); border: 1px solid rgba(57,255,20,0.3); }
+  .status-out { background: rgba(90,122,154,0.2);  color: var(--text-muted); border: 1px solid var(--border); }
+  .status-pending { background: rgba(255,215,0,0.15); color: var(--warning); border: 1px solid rgba(255,215,0,0.3); }
+
+  /* ─── Slot stack visual ─── */
+  .stack-wrap {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 8px;
+  }
+  .slot-box {
+    aspect-ratio: 1; border-radius: 4px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-family: var(--font-mono);
+    font-size: 0.7rem; gap: 3px; cursor: pointer; transition: all .2s; border: 1px solid;
+    position: relative;
+  }
+  .slot-box.free   { background: rgba(57,255,20,0.07); border-color: rgba(57,255,20,0.3); color: var(--success); }
+  .slot-box.free:hover { background: rgba(57,255,20,0.15); }
+  .slot-box.taken  { background: rgba(255,59,92,0.07); border-color: rgba(255,59,92,0.3); color: var(--danger); }
+  .slot-box.reserved { background: rgba(255,215,0,0.07); border-color: rgba(255,215,0,0.3); color: var(--warning); }
+  .slot-box i { font-size: 1.1rem; }
+  .slot-plate { font-size: 0.58rem; color: var(--text-muted); text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 60px; }
+
+  /* ─── Timeline ─── */
+  .timeline-item {
+    display: flex; gap: 16px; padding: 12px 0;
+    border-bottom: 1px solid rgba(0,229,255,0.05);
+  }
+  .timeline-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    border: 2px solid;
+  }
+  .timeline-dot.entry { border-color: var(--success); background: rgba(57,255,20,0.3); }
+  .timeline-dot.exit  { border-color: var(--danger);  background: rgba(255,59,92,0.3); }
+  .timeline-time { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); min-width: 130px; }
+  .timeline-desc { font-size: 0.85rem; }
+  .timeline-plate { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
+
+  /* ─── Stack pointer ─── */
+  .stack-pointer-bar {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(0,229,255,0.05); border: 1px dashed var(--border);
+    padding: 10px 16px; border-radius: 4px; margin-bottom: 12px;
+    font-family: var(--font-mono); font-size: 0.78rem;
+  }
+  .sp-label { color: var(--text-muted); }
+  .sp-value { color: var(--accent); font-weight: 700; font-size: 1rem; }
+
+  /* ─── Scan animation ─── */
+  @keyframes scan-line {
+    0%  { top: 0; }
+    100%{ top: 100%; }
+  }
+  .scan-container {
+    position: relative; border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; background: rgba(0,229,255,0.02);
+    padding: 20px 16px;
+  }
+  .scan-container::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scan-line 2.5s linear infinite;
+    opacity: .4;
+  }
+
+  /* ─── QR mock ─── */
+  .qr-mock {
+    width: 100px; height: 100px; margin: 0 auto;
+    background: #fff; display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; padding: 8px;
+    border-radius: 4px;
+  }
+  .qr-cell { background: #000; border-radius: 1px; }
+  .qr-cell.w { background: #fff; }
+
+  /* ─── Responsive ─── */
+  @media(max-width:900px){
+    .main-wrap { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+
+  /* ─── Utilities ─── */
+  .text-accent { color: var(--accent) !important; }
+  .text-success-c { color: var(--success) !important; }
+  .text-danger-c  { color: var(--danger) !important; }
+  .text-warning-c { color: var(--warning) !important; }
+  .text-muted-c   { color: var(--text-muted) !important; }
+  .mono { font-family: var(--font-mono); }
+  .fw700 { font-weight: 700; }
+  .section-hidden { display: none; }
+
+  /* Corner decoration */
+  .corner-tl, .corner-br {
+    position: absolute; width: 12px; height: 12px;
+  }
+  .corner-tl { top: 6px; left: 6px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+  .corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <div class="header-brand">
+    <div class="brand-icon"><i class="bi bi-shield-lock-fill"></i></div>
+    <div>
+      <div class="brand-name">PARK<span style="color:var(--accent)">SECURE</span></div>
+      <div class="brand-sub">Vehicle Parking Management</div>
+    </div>
+  </div>
+  <div class="header-nav d-none d-md-flex">
+    <a class="nav-pill" href="#">User &amp; Vehicle</a>
+    <a class="nav-pill" href="#">Reservations</a>
+    <a class="nav-pill" href="#">Admin</a>
+    <a class="nav-pill active" href="#">Security</a>
+    <a class="nav-pill" href="#">History</a>
+    <a class="nav-pill" href="#">Billing</a>
+  </div>
+  <div class="live-badge">
+    <span class="live-dot"></span>
+    <span id="live-clock">--:--:--</span>
+  </div>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main-wrap">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section-label">Access Control</div>
+    <button class="sidebar-item active" onclick="showSection('vehicle-entry')">
+      <i class="bi bi-box-arrow-in-right"></i> Vehicle Entry
+    </button>
+    <button class="sidebar-item" onclick="showSection('vehicle-exit')">
+      <i class="bi bi-box-arrow-right"></i> Vehicle Exit
+    </button>
+    <button class="sidebar-item" onclick="showSection('slot-map')">
+      <i class="bi bi-grid-3x3-gap-fill"></i> Slot Map
+      <span class="sidebar-badge green" id="sb-free-count">0</span>
+    </button>
+
+    <div class="sidebar-section-label">Monitoring</div>
+    <button class="sidebar-item" onclick="showSection('active-sessions')">
+      <i class="bi bi-activity"></i> Active Sessions
+      <span class="sidebar-badge" id="sb-active-count">0</span>
+    </button>
+    <button class="sidebar-item" onclick="showSection('access-log')">
+      <i class="bi bi-journal-code"></i> Access Log
+    </button>
+
+    <div class="sidebar-section-label">Tools</div>
+    <button class="sidebar-item" onclick="showSection('gate-control')">
+      <i class="bi bi-door-open"></i> Gate Control
+    </button>
+
+    <div style="margin-top:auto; padding-top:16px;">
+      <div class="glass-card" style="padding:12px;">
+        <div class="card-label">Stack Pointer</div>
+        <div class="card-value accent" id="sb-stack-ptr">TOP: —</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- ── VEHICLE ENTRY ── -->
+    <section id="sec-vehicle-entry">
+      <div class="section-title">Vehicle <span>Entry</span></div>
+      <div class="section-sub">// SECURITY MODULE 04 — ACCESS CONTROL</div>
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="glass-card">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">Slots Free</div>
+            <div class="card-value green" id="stat-free">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="glass-card">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">Occupied</div>
+            <div class="card-value danger" id="stat-occ">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="glass-card">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">Total Slots</div>
+            <div class="card-value accent" id="stat-total">12</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="glass-card">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">Stack Top</div>
+            <div class="card-value warning mono" id="stat-top">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode toggle -->
+      <div class="mode-toggle-wrap">
+        <button class="mode-btn active" id="btn-login-mode" onclick="setMode('login')">
+          <i class="bi bi-person-check me-2"></i>LOG IN
+        </button>
+        <button class="mode-btn" id="btn-register-mode" onclick="setMode('register')">
+          <i class="bi bi-person-plus me-2"></i>REGISTER
+        </button>
+      </div>
+
+      <div class="row g-4">
+        <!-- LOGIN FORM -->
+        <div class="col-lg-6" id="form-login">
+          <div class="glass-card scan-container">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label mb-3">⚡ Registered Vehicle — Log In</div>
+
+            <div class="mb-3">
+              <label class="form-label-cyber">Vehicle Plate Number</label>
+              <input type="text" id="login-plate" class="input-cyber" placeholder="e.g. ABC-1234" oninput="this.value=this.value.toUpperCase()"/>
+            </div>
+            <div class="mb-3">
+              <label class="form-label-cyber">Owner PIN / Password</label>
+              <input type="password" id="login-pin" class="input-cyber" placeholder="Enter PIN"/>
+            </div>
+            <div id="login-alert" class="alert-cyber"></div>
+            <div class="d-flex gap-3 mt-3">
+              <button class="btn-cyber btn-primary-cyber" onclick="handleLogin()">
+                <i class="bi bi-door-open me-2"></i>GRANT ENTRY
+              </button>
+              <button class="btn-cyber btn-secondary-cyber" onclick="quickLookup()">
+                <i class="bi bi-search me-2"></i>LOOKUP
+              </button>
+            </div>
+            <!-- Lookup result -->
+            <div id="lookup-result" class="mt-3" style="display:none;">
+              <div class="cyber-divider"></div>
+              <div class="row g-2">
+                <div class="col-6"><span class="form-label-cyber">Owner</span><div class="mono text-accent" id="lr-owner">—</div></div>
+                <div class="col-6"><span class="form-label-cyber">Vehicle</span><div class="mono text-accent" id="lr-vehicle">—</div></div>
+                <div class="col-6"><span class="form-label-cyber">Type</span><div class="mono" id="lr-type">—</div></div>
+                <div class="col-6"><span class="form-label-cyber">Status</span><div id="lr-status">—</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="col-lg-6" id="form-register" style="display:none;">
+          <div class="glass-card scan-container">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label mb-3">🆕 New Vehicle — Register</div>
+
+            <div class="row g-2">
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Owner Full Name</label>
+                <input type="text" id="reg-name" class="input-cyber" placeholder="John Silva"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Contact Number</label>
+                <input type="text" id="reg-contact" class="input-cyber" placeholder="07X-XXXXXXX"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Plate Number</label>
+                <input type="text" id="reg-plate" class="input-cyber" placeholder="ABC-1234" oninput="this.value=this.value.toUpperCase()"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Vehicle Type</label>
+                <select id="reg-type" class="input-cyber">
+                  <option value="">Select...</option>
+                  <option>Car</option><option>Motorcycle</option>
+                  <option>Van</option><option>Truck</option><option>SUV</option>
+                </select>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Vehicle Model</label>
+                <input type="text" id="reg-model" class="input-cyber" placeholder="Toyota Prius"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Vehicle Color</label>
+                <input type="text" id="reg-color" class="input-cyber" placeholder="White"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Set PIN</label>
+                <input type="password" id="reg-pin" class="input-cyber" placeholder="4-digit PIN"/>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="form-label-cyber">Confirm PIN</label>
+                <input type="password" id="reg-pin2" class="input-cyber" placeholder="Repeat PIN"/>
+              </div>
+            </div>
+            <div id="reg-alert" class="alert-cyber"></div>
+            <button class="btn-cyber btn-success-cyber mt-3 w-100" onclick="handleRegister()">
+              <i class="bi bi-person-plus-fill me-2"></i>REGISTER &amp; ENTER
+            </button>
+          </div>
+        </div>
+
+        <!-- Entry ticket panel -->
+        <div class="col-lg-6">
+          <div class="glass-card" id="entry-ticket" style="display:none;">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">🎫 Entry Ticket</div>
+            <div class="cyber-divider"></div>
+            <div class="row g-2 mb-3">
+              <div class="col-6"><span class="form-label-cyber">Plate</span><div class="mono fw700 text-accent" id="tk-plate">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Slot</span><div class="mono fw700 text-success-c" id="tk-slot">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Owner</span><div class="mono" id="tk-owner">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Vehicle</span><div class="mono" id="tk-vehicle">—</div></div>
+              <div class="col-12"><span class="form-label-cyber">Entry Time</span><div class="mono text-warning-c fw700" id="tk-time">—</div></div>
+              <div class="col-12"><span class="form-label-cyber">Token</span><div class="mono" id="tk-token" style="font-size:.7rem; color:var(--text-muted);">—</div></div>
+            </div>
+            <!-- Simple QR mock -->
+            <div id="qr-container" style="text-align:center; margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VEHICLE EXIT ── -->
+    <section id="sec-vehicle-exit" class="section-hidden">
+      <div class="section-title">Vehicle <span>Exit</span></div>
+      <div class="section-sub">// RECORD EXIT TIME — RELEASE PARKING SLOT</div>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="glass-card scan-container">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label mb-3">🚗 Process Exit</div>
+            <div class="mb-3">
+              <label class="form-label-cyber">Plate Number</label>
+              <input type="text" id="exit-plate" class="input-cyber" placeholder="e.g. ABC-1234" oninput="this.value=this.value.toUpperCase()"/>
+            </div>
+            <div id="exit-alert" class="alert-cyber"></div>
+            <button class="btn-cyber btn-danger-cyber mt-2" onclick="handleExit()">
+              <i class="bi bi-box-arrow-right me-2"></i>PROCESS EXIT
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="glass-card" id="exit-receipt" style="display:none;">
+            <div class="corner-tl"></div><div class="corner-br"></div>
+            <div class="card-label">🧾 Exit Summary</div>
+            <div class="cyber-divider"></div>
+            <div class="row g-2">
+              <div class="col-6"><span class="form-label-cyber">Plate</span><div class="mono fw700 text-accent" id="ex-plate">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Slot Released</span><div class="mono text-success-c" id="ex-slot">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Entry Time</span><div class="mono" id="ex-entry">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Exit Time</span><div class="mono text-danger-c" id="ex-exit">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Duration</span><div class="mono fw700 text-warning-c" id="ex-duration">—</div></div>
+              <div class="col-6"><span class="form-label-cyber">Owner</span><div class="mono" id="ex-owner">—</div></div>
+            </div>
+            <div class="mt-3 p-2" style="background:rgba(57,255,20,0.06); border:1px solid rgba(57,255,20,0.2); border-radius:4px;">
+              <i class="bi bi-check-circle-fill text-success-c me-2"></i>
+              <span class="mono" style="font-size:.8rem; color:var(--success);">Slot returned to stack. Gate opened.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLOT MAP ── -->
+    <section id="sec-slot-map" class="section-hidden">
+      <div class="section-title">Slot <span>Map</span></div>
+      <div class="section-sub">// QUICK-SORTED BY AVAILABILITY — DATA STRUCTURE: STACK</div>
+
+      <div class="stack-pointer-bar">
+        <span class="sp-label">STACK POINTER →</span>
+        <span class="sp-value" id="slot-stack-top">—</span>
+        <span class="sp-label" style="margin-left:20px;">ALGORITHM:</span>
+        <span style="color:var(--accent2); font-family:var(--font-mono); font-size:.75rem;">QUICK SORT (availability)</span>
+      </div>
+
+      <div class="glass-card mb-4">
+        <div class="card-label mb-2">PARKING GRID — HOVER FOR DETAILS</div>
+        <div class="stack-wrap" id="slot-grid"></div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-auto">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:12px;height:12px;background:rgba(57,255,20,0.3);border:1px solid var(--success);border-radius:2px;"></div>
+            <span class="mono" style="font-size:.75rem;">Free</span>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:12px;height:12px;background:rgba(255,59,92,0.3);border:1px solid var(--danger);border-radius:2px;"></div>
+            <span class="mono" style="font-size:.75rem;">Occupied</span>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:12px;height:12px;background:rgba(255,215,0,0.3);border:1px solid var(--warning);border-radius:2px;"></div>
+            <span class="mono" style="font-size:.75rem;">Reserved</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ACTIVE SESSIONS ── -->
+    <section id="sec-active-sessions" class="section-hidden">
+      <div class="section-title">Active <span>Sessions</span></div>
+      <div class="section-sub">// VEHICLES CURRENTLY INSIDE — LIVE DURATION</div>
+
+      <div class="glass-card">
+        <div class="card-label mb-3">LIVE PARKING SESSIONS</div>
+        <div class="table-responsive">
+          <table class="table-cyber">
+            <thead>
+              <tr>
+                <th>#</th><th>Plate</th><th>Owner</th>
+                <th>Type</th><th>Slot</th>
+                <th>Entry Time</th><th>Duration</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="active-tbody"></tbody>
+          </table>
+        </div>
+        <div id="no-active" class="text-center py-4 mono" style="color:var(--text-muted); display:none; font-size:.8rem;">
+          — NO ACTIVE SESSIONS —
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ACCESS LOG ── -->
+    <section id="sec-access-log" class="section-hidden">
+      <div class="section-title">Access <span>Log</span></div>
+      <div class="section-sub">// FULL ENTRY / EXIT HISTORY</div>
+
+      <div class="glass-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="card-label mb-0">EVENT TIMELINE</div>
+          <button class="btn-cyber btn-secondary-cyber" style="padding:6px 16px; font-size:.75rem;" onclick="clearLog()">
+            <i class="bi bi-trash me-1"></i>CLEAR
+          </button>
+        </div>
+        <div id="access-timeline">
+          <div class="text-center py-4 mono" style="color:var(--text-muted); font-size:.8rem;">— LOG IS EMPTY —</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── GATE CONTROL ── -->
+    <section id="sec-gate-control" class="section-hidden">
+      <div class="section-title">Gate <span>Control</span></div>
+      <div class="section-sub">// MANUAL OVERRIDE — AUTHORIZED PERSONNEL ONLY</div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="glass-card text-center">
+            <div class="card-label">ENTRY GATE</div>
+            <div id="gate-entry-status" class="card-value danger mb-3">CLOSED</div>
+            <button class="btn-cyber btn-success-cyber w-100" onclick="toggleGate('entry')">
+              <i class="bi bi-door-open me-2"></i>TOGGLE
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card text-center">
+            <div class="card-label">EXIT GATE</div>
+            <div id="gate-exit-status" class="card-value danger mb-3">CLOSED</div>
+            <button class="btn-cyber btn-success-cyber w-100" onclick="toggleGate('exit')">
+              <i class="bi bi-door-open me-2"></i>TOGGLE
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card text-center">
+            <div class="card-label">EMERGENCY</div>
+            <div class="card-value warning mb-3">STANDBY</div>
+            <button class="btn-cyber btn-danger-cyber w-100" onclick="emergencyOpen()">
+              <i class="bi bi-exclamation-triangle me-2"></i>OPEN ALL
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA STRUCTURES
+═══════════════════════════════════════════════════ */
+
+// Registered vehicles database
+let vehicleDB = [
+  { plate:'KA-1234', owner:'Nimal Perera',    contact:'071-1234567', type:'Car',        model:'Toyota Prius',   color:'White',  pin:'1234' },
+  { plate:'WP-5678', owner:'Saman Fernando',  contact:'076-7654321', type:'Motorcycle', model:'Honda CB150R',   color:'Black',  pin:'5678' },
+  { plate:'NW-9012', owner:'Kamala Silva',    contact:'077-9012345', type:'SUV',        model:'Mitsubishi SUV', color:'Silver', pin:'9012' },
+  { plate:'SP-3456', owner:'Ruwan Jayawardena',contact:'078-3456789',type:'Van',        model:'Toyota HiAce',   color:'Blue',   pin:'3456' },
+];
+
+// STACK — manages parking slot allocation (LIFO)
+const TOTAL_SLOTS = 12;
+class ParkingStack {
+  constructor(size) {
+    this.slots = [];
+    for(let i = 1; i <= size; i++) {
+      this.slots.push({ id:`S${String(i).padStart(2,'0')}`, status:'free', plate:null, entryTime:null });
+    }
+    this.top = -1; // nothing pushed yet (all free)
+  }
+  // Push: mark slot as occupied (top of stack = most recently used)
+  push(plate, entryTime) {
+    const free = this.getNextFree();
+    if(!free) return null;
+    free.status = 'taken';
+    free.plate = plate;
+    free.entryTime = entryTime;
+    this.top++;
+    return free;
+  }
+  // Pop: release slot (find by plate, simulate pop)
+  pop(plate) {
+    const slot = this.slots.find(s => s.plate === plate);
+    if(!slot) return null;
+    const released = { ...slot };
+    slot.status = 'free';
+    slot.plate = null;
+    slot.entryTime = null;
+    this.top = Math.max(-1, this.top - 1);
+    return released;
+  }
+  getNextFree() {
+    // Quick-sort free slots by id, return first
+    const free = this.slots.filter(s => s.status === 'free');
+    quickSort(free, 0, free.length - 1);
+    return free[0] || null;
+  }
+  freeCount()  { return this.slots.filter(s => s.status === 'free').length; }
+  takenCount() { return this.slots.filter(s => s.status === 'taken').length; }
+  topSlot()    { const t = this.slots.filter(s => s.status === 'taken'); return t.length ? t[t.length-1].id : '—'; }
+}
+
+// QUICK SORT — sort slots by id (availability ordering)
+function quickSort(arr, low, high) {
+  if(low < high) {
+    const pi = partition(arr, low, high);
+    quickSort(arr, low, pi - 1);
+    quickSort(arr, pi + 1, high);
+  }
+}
+function partition(arr, low, high) {
+  const pivot = arr[high].id;
+  let i = low - 1;
+  for(let j = low; j < high; j++) {
+    if(arr[j].id <= pivot) { i++; [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  }
+  [arr[i+1], arr[high]] = [arr[high], arr[i+1]];
+  return i + 1;
+}
+
+const parkingStack = new ParkingStack(TOTAL_SLOTS);
+
+// Active sessions store
+let activeSessions = [];
+// Access log
+let accessLog = [];
+// Gate states
+let gates = { entry: false, exit: false };
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════ */
+function now() { return new Date(); }
+function fmtTime(d) {
+  return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true})
+    + ' — ' + d.toLocaleDateString('en-LK');
+}
+function duration(start, end) {
+  const ms = end - start;
+  const h = Math.floor(ms/3600000);
+  const m = Math.floor((ms%3600000)/60000);
+  const s = Math.floor((ms%60000)/1000);
+  return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+function genToken() {
+  return 'TKN-' + Math.random().toString(36).substring(2,8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+}
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = `alert-cyber ${type}`; el.style.display = 'block';
+  setTimeout(()=>{ el.style.display='none'; }, 4000);
+}
+
+function updateAllStats() {
+  document.getElementById('stat-free').textContent  = parkingStack.freeCount();
+  document.getElementById('stat-occ').textContent   = parkingStack.takenCount();
+  document.getElementById('stat-total').textContent = TOTAL_SLOTS;
+  const top = parkingStack.topSlot();
+  document.getElementById('stat-top').textContent   = top;
+  document.getElementById('sb-free-count').textContent   = parkingStack.freeCount();
+  document.getElementById('sb-active-count').textContent = activeSessions.length;
+  document.getElementById('sb-stack-ptr').textContent    = 'TOP: ' + top;
+  document.getElementById('slot-stack-top').textContent  = top;
+}
+
+/* ═══════════════════════════════════════════════════
+   CLOCK
+═══════════════════════════════════════════════════ */
+setInterval(()=>{
+  document.getElementById('live-clock').textContent = new Date().toLocaleTimeString();
+  refreshActiveSessions();
+}, 1000);
+
+/* ═══════════════════════════════════════════════════
+   SECTION NAVIGATION
+═══════════════════════════════════════════════════ */
+const SECTIONS = ['vehicle-entry','vehicle-exit','slot-map','active-sessions','access-log','gate-control'];
+function showSection(name) {
+  SECTIONS.forEach(s => {
+    document.getElementById(`sec-${s}`).classList.toggle('section-hidden', s !== name);
+  });
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const clicked = [...document.querySelectorAll('.sidebar-item')].find(el => el.getAttribute('onclick')?.includes(name));
+  if(clicked) clicked.classList.add('active');
+  if(name === 'slot-map') renderSlotMap();
+  if(name === 'active-sessions') refreshActiveSessions();
+  if(name === 'access-log') renderLog();
+}
+
+/* ═══════════════════════════════════════════════════
+   MODE TOGGLE (Login / Register)
+═══════════════════════════════════════════════════ */
+function setMode(mode) {
+  document.getElementById('form-login').style.display    = mode === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = mode === 'register' ? '' : 'none';
+  document.getElementById('btn-login-mode').classList.toggle('active', mode === 'login');
+  document.getElementById('btn-register-mode').classList.toggle('active', mode === 'register');
+  document.getElementById('entry-ticket').style.display = 'none';
+  document.getElementById('lookup-result').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════
+   VEHICLE LOOKUP
+═══════════════════════════════════════════════════ */
+function quickLookup() {
+  const plate = document.getElementById('login-plate').value.trim().toUpperCase();
+  if(!plate) { showAlert('login-alert','Enter a plate number to look up.','warning'); return; }
+  const v = vehicleDB.find(x => x.plate === plate);
+  const res = document.getElementById('lookup-result');
+  if(!v) { showAlert('login-alert',`Plate ${plate} not found in database.`,'error'); res.style.display='none'; return; }
+  const active = activeSessions.find(s => s.plate === plate);
+  res.style.display = 'block';
+  document.getElementById('lr-owner').textContent   = v.owner;
+  document.getElementById('lr-vehicle').textContent = `${v.color} ${v.model}`;
+  document.getElementById('lr-type').textContent    = v.type;
+  document.getElementById('lr-status').innerHTML    = active
+    ? `<span class="status-badge status-in">INSIDE — Slot ${active.slot}</span>`
+    : `<span class="status-badge status-out">NOT INSIDE</span>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   VEHICLE LOGIN (Entry for registered)
+═══════════════════════════════════════════════════ */
+function handleLogin() {
+  const plate = document.getElementById('login-plate').value.trim().toUpperCase();
+  const pin   = document.getElementById('login-pin').value.trim();
+  if(!plate||!pin) { showAlert('login-alert','Plate number and PIN are required.','error'); return; }
+
+  const v = vehicleDB.find(x => x.plate === plate);
+  if(!v) { showAlert('login-alert','Vehicle not registered. Please use the REGISTER tab.','error'); return; }
+  if(v.pin !== pin) { showAlert('login-alert','Incorrect PIN. Access denied.','error'); return; }
+
+  const already = activeSessions.find(s => s.plate === plate);
+  if(already) { showAlert('login-alert',`Vehicle ${plate} is already inside (Slot ${already.slot}).`,'warning'); return; }
+
+  if(parkingStack.freeCount() === 0) { showAlert('login-alert','No slots available. Parking full.','error'); return; }
+
+  const entryTime = now();
+  const slot = parkingStack.push(plate, entryTime);
+  const token = genToken();
+
+  activeSessions.push({ plate, owner:v.owner, type:v.type, model:v.model, color:v.color, slot:slot.id, entryTime, token });
+  pushLog('entry', plate, v.owner, slot.id, entryTime);
+  updateAllStats();
+  showEntryTicket({ plate, owner:v.owner, vehicle:`${v.color} ${v.model}`, slot:slot.id, entryTime, token });
+  showAlert('login-alert',`ACCESS GRANTED — Slot ${slot.id} assigned.`,'success');
+  document.getElementById('login-pin').value = '';
+}
+
+/* ═══════════════════════════════════════════════════
+   VEHICLE REGISTER + ENTRY
+═══════════════════════════════════════════════════ */
+function handleRegister() {
+  const name    = document.getElementById('reg-name').value.trim();
+  const contact = document.getElementById('reg-contact').value.trim();
+  const plate   = document.getElementById('reg-plate').value.trim().toUpperCase();
+  const type    = document.getElementById('reg-type').value;
+  const model   = document.getElementById('reg-model').value.trim();
+  const color   = document.getElementById('reg-color').value.trim();
+  const pin     = document.getElementById('reg-pin').value.trim();
+  const pin2    = document.getElementById('reg-pin2').value.trim();
+
+  if(!name||!contact||!plate||!type||!model||!color||!pin||!pin2) {
+    showAlert('reg-alert','All fields are required.','error'); return;
+  }
+  if(pin !== pin2) { showAlert('reg-alert','PINs do not match.','error'); return; }
+  if(vehicleDB.find(x => x.plate === plate)) {
+    showAlert('reg-alert',`Plate ${plate} already registered. Use LOG IN tab.`,'warning'); return;
+  }
+  if(parkingStack.freeCount() === 0) { showAlert('reg-alert','No slots available. Parking full.','error'); return; }
+
+  vehicleDB.push({ plate, owner:name, contact, type, model, color, pin });
+
+  const entryTime = now();
+  const slot = parkingStack.push(plate, entryTime);
+  const token = genToken();
+
+  activeSessions.push({ plate, owner:name, type, model, color, slot:slot.id, entryTime, token });
+  pushLog('entry', plate, name, slot.id, entryTime);
+  updateAllStats();
+  showEntryTicket({ plate, owner:name, vehicle:`${color} ${model}`, slot:slot.id, entryTime, token });
+  showAlert('reg-alert',`Registered successfully! Slot ${slot.id} assigned.`,'success');
+
+  // Clear form
+  ['reg-name','reg-contact','reg-plate','reg-model','reg-color','reg-pin','reg-pin2'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('reg-type').value = '';
+}
+
+/* ═══════════════════════════════════════════════════
+   ENTRY TICKET DISPLAY
+═══════════════════════════════════════════════════ */
+function showEntryTicket({ plate, owner, vehicle, slot, entryTime, token }) {
+  document.getElementById('tk-plate').textContent   = plate;
+  document.getElementById('tk-slot').textContent    = slot;
+  document.getElementById('tk-owner').textContent   = owner;
+  document.getElementById('tk-vehicle').textContent = vehicle;
+  document.getElementById('tk-time').textContent    = fmtTime(entryTime);
+  document.getElementById('tk-token').textContent   = token;
+  const ticket = document.getElementById('entry-ticket');
+  ticket.style.display = 'block';
+  // Generate simple QR-like pattern
+  const qrEl = document.getElementById('qr-container');
+  qrEl.innerHTML = generateQR();
+}
+
+function generateQR() {
+  // Deterministic-looking QR mock (7x7 cells)
+  const pattern = [1,1,1,0,1,1,1,1,0,0,1,0,0,1,1,0,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,0,1,1,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1];
+  let html = '<div class="qr-mock">';
+  pattern.forEach(c => { html += `<div class="qr-cell ${c?'':'w'}"></div>`; });
+  html += '</div><div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);margin-top:4px;">SCAN TO VERIFY</div>';
+  return html;
+}
+
+/* ═══════════════════════════════════════════════════
+   VEHICLE EXIT
+═══════════════════════════════════════════════════ */
+function handleExit() {
+  const plate = document.getElementById('exit-plate').value.trim().toUpperCase();
+  if(!plate) { showAlert('exit-alert','Enter plate number.','error'); return; }
+
+  const idx = activeSessions.findIndex(s => s.plate === plate);
+  if(idx === -1) { showAlert('exit-alert',`No active session found for ${plate}.`,'error'); return; }
+
+  const session = activeSessions[idx];
+  const exitTime = now();
+  const dur = duration(session.entryTime, exitTime);
+  const slot = parkingStack.pop(plate);
+
+  pushLog('exit', plate, session.owner, session.slot, exitTime);
+  activeSessions.splice(idx, 1);
+  updateAllStats();
+
+  // Show receipt
+  document.getElementById('ex-plate').textContent    = plate;
+  document.getElementById('ex-slot').textContent     = session.slot;
+  document.getElementById('ex-entry').textContent    = fmtTime(session.entryTime);
+  document.getElementById('ex-exit').textContent     = fmtTime(exitTime);
+  document.getElementById('ex-duration').textContent = dur;
+  document.getElementById('ex-owner').textContent    = session.owner;
+  document.getElementById('exit-receipt').style.display = 'block';
+  showAlert('exit-alert',`EXIT PROCESSED — Slot ${session.slot} released.`,'success');
+  document.getElementById('exit-plate').value = '';
+}
+
+/* ═══════════════════════════════════════════════════
+   SLOT MAP RENDER
+═══════════════════════════════════════════════════ */
+function renderSlotMap() {
+  const grid = document.getElementById('slot-grid');
+  grid.innerHTML = '';
+  // Quick sort slots before display
+  const sorted = [...parkingStack.slots];
+  quickSort(sorted, 0, sorted.length - 1);
+  sorted.forEach(slot => {
+    const box = document.createElement('div');
+    box.className = `slot-box ${slot.status}`;
+    const icon = slot.status === 'free' ? 'bi-p-circle' : 'bi-car-front-fill';
+    box.innerHTML = `<i class="bi ${icon}"></i><div>${slot.id}</div><div class="slot-plate">${slot.plate||''}</div>`;
+    box.title = slot.status === 'taken' ? `Plate: ${slot.plate}` : 'Available';
+    grid.appendChild(box);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ACTIVE SESSIONS TABLE
+═══════════════════════════════════════════════════ */
+function refreshActiveSessions() {
+  const tbody = document.getElementById('active-tbody');
+  const noActive = document.getElementById('no-active');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  if(activeSessions.length === 0) { noActive.style.display='block'; return; }
+  noActive.style.display = 'none';
+  activeSessions.forEach((s,i) => {
+    const dur = duration(s.entryTime, now());
+    tbody.innerHTML += `
+      <tr>
+        <td class="text-muted-c">${i+1}</td>
+        <td class="fw700 text-accent">${s.plate}</td>
+        <td>${s.owner}</td>
+        <td>${s.type}</td>
+        <td><span class="status-badge status-in">${s.slot}</span></td>
+        <td class="mono" style="font-size:.75rem">${fmtTime(s.entryTime)}</td>
+        <td class="mono text-warning-c">${dur}</td>
+        <td><span class="status-badge status-in">ACTIVE</span></td>
+      </tr>`;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ACCESS LOG
+═══════════════════════════════════════════════════ */
+function pushLog(type, plate, owner, slot, time) {
+  accessLog.unshift({ type, plate, owner, slot, time });
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById('access-timeline');
+  if(accessLog.length === 0) {
+    el.innerHTML = '<div class="text-center py-4 mono" style="color:var(--text-muted);font-size:.8rem;">— LOG IS EMPTY —</div>'; return;
+  }
+  el.innerHTML = accessLog.map(e => `
+    <div class="timeline-item">
+      <div class="timeline-dot ${e.type}"></div>
+      <div>
+        <div class="timeline-time">${fmtTime(e.time)}</div>
+        <div class="timeline-desc">
+          <span class="timeline-plate">${e.plate}</span>
+          <span class="text-muted-c mono" style="font-size:.75rem;"> — ${e.owner}</span>
+          <span class="status-badge ${e.type==='entry'?'status-in':'status-out'} ms-2">
+            ${e.type === 'entry' ? '▶ ENTRY' : '◀ EXIT'}</span>
+          <span class="mono ms-2" style="font-size:.72rem;color:var(--text-muted);">Slot: ${e.slot}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function clearLog() { accessLog = []; renderLog(); }
+
+/* ═══════════════════════════════════════════════════
+   GATE CONTROL
+═══════════════════════════════════════════════════ */
+function toggleGate(which) {
+  gates[which] = !gates[which];
+  const el = document.getElementById(`gate-${which}-status`);
+  el.textContent = gates[which] ? 'OPEN' : 'CLOSED';
+  el.className = `card-value ${gates[which] ? 'green' : 'danger'} mb-3`;
+}
+function emergencyOpen() {
+  ['entry','exit'].forEach(g => { gates[g] = true; toggleGate(g); gates[g]=true; });
+  document.querySelectorAll('[id^=gate-][id$=-status]').forEach(el => { el.textContent='OPEN'; el.className='card-value green mb-3'; });
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+updateAllStats();
+renderSlotMap();
+</script>
+</body>
+</html>
