@@ -1,11 +1,5 @@
 package Parking;
 
-/**
- * Staff.java
- * Represents a staff member who works at the parking facility
- * These are NOT vehicle owners (Users) — they are employees
- * Examples: Security Guard, Billing Staff, Parking Attendant
- */
 public class Staff {
 
     private int    staffId;
