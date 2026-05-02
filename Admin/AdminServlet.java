@@ -10,19 +10,9 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
-    /**
-     * AdminServlet.java
-     * Handles admin dashboard — shows all users, slots, reports
-     *
-     * GET  /admin       → show admin dashboard
-     * POST /deleteUser  → delete a user by ID
-     */
     @WebServlet({"/admin", "/deleteUser"})
     public class AdminServlet extends HttpServlet {
 
-        // ═══════════════════════════════════════
-        // GET — load admin dashboard with all data
-        // ═══════════════════════════════════════
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws ServletException, IOException {
@@ -50,9 +40,6 @@ import javax.servlet.annotation.*;
             req.getRequestDispatcher("dashboard.jsp").forward(req, res);
         }
 
-        // ═══════════════════════════════════════
-        // POST — handle delete user action
-        // ═══════════════════════════════════════
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse res)
                 throws ServletException, IOException {
