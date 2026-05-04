@@ -6,9 +6,8 @@ import java.util.List;
 
 public class UserDAO {
 
-    // ═══════════════════════════════════════
     // ADD USER
-    // ═══════════════════════════════════════
+    
     public void addUser(User user) throws SQLException {
         if (getUserByUsername(user.getUsername()) != null)
             throw new SQLException("USERNAME_EXISTS");
@@ -30,9 +29,9 @@ public class UserDAO {
         }
     }
 
-    // ═══════════════════════════════════════
-    // UPDATE USER — for edit profile
-    // ═══════════════════════════════════════
+   
+    // UPDATE USER 
+   
     public void updateUser(User user) throws SQLException {
         String sql = "UPDATE users SET name=?, contact=?, vehicle_no=?, vehicle_type=? WHERE user_id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -46,9 +45,9 @@ public class UserDAO {
         }
     }
 
-    // ═══════════════════════════════════════
+   
     // CHECK VEHICLE EXISTS
-    // ═══════════════════════════════════════
+    
     public boolean isVehicleNoExists(String vehicleNo) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE vehicle_no = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -60,9 +59,9 @@ public class UserDAO {
         return false;
     }
 
-    // ═══════════════════════════════════════
+   
     // GET ALL USERS
-    // ═══════════════════════════════════════
+   
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY user_id DESC";
@@ -84,9 +83,9 @@ public class UserDAO {
         return users;
     }
 
-    // ═══════════════════════════════════════
+   
     // GET USER BY USERNAME
-    // ═══════════════════════════════════════
+   
     public User getUserByUsername(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username=?";
         try (Connection conn = DBConnection.getConnection();
@@ -109,9 +108,9 @@ public class UserDAO {
         return null;
     }
 
-    // ═══════════════════════════════════════
+   
     // GET USER BY ID
-    // ═══════════════════════════════════════
+   
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM users WHERE user_id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -134,9 +133,9 @@ public class UserDAO {
         return null;
     }
 
-    // ═══════════════════════════════════════
+    
     // DELETE USER
-    // ═══════════════════════════════════════
+   
     public void deleteUser(int userId) throws SQLException {
         String sql = "DELETE FROM users WHERE user_id=?";
         try (Connection conn = DBConnection.getConnection();
