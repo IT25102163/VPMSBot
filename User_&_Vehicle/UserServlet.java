@@ -37,7 +37,7 @@ public class UserServlet extends HttpServlet {
 
         String path = req.getServletPath();
 
-        // ── EDIT USER ─────────────────────────────
+        // EDIT USER
         if ("/editUser".equals(path)) {
             try {
                 int    userId     = Integer.parseInt(req.getParameter("userId"));
@@ -62,7 +62,8 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
-        // ── REGISTER NEW USER ─────────────────────
+        //  REGISTER NEW USER 
+                
         String name        = req.getParameter("name");
         String contact     = req.getParameter("contact");
         String username    = req.getParameter("username");
