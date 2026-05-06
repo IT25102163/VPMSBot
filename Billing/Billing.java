@@ -8,7 +8,7 @@ public class Billing {
         private String paymentMethod;
         private String status;
 
-        // Constructor with ID (reading from database)
+        // Constructor with ID 
         public Billing(int id, String vehicleNo, double amount, String paymentMethod, String status) {
             this.id            = id;
             this.vehicleNo     = vehicleNo;
@@ -17,7 +17,7 @@ public class Billing {
             this.status        = status;
         }
 
-        // Constructor without ID (creating new record)
+        // Constructor without ID 
         public Billing(String vehicleNo, double amount, String paymentMethod, String status) {
             this.vehicleNo     = vehicleNo;
             this.amount        = amount;
