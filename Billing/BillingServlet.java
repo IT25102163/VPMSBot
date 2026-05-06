@@ -24,7 +24,7 @@ public class BillingServlet extends HttpServlet {
         String action = req.getParameter("action");
         ParkingLotDAO dao = new ParkingLotDAO();
 
-        // DELETE
+        // Deleting
         if ("delete".equals(action)) {
             try { dao.deleteBilling(Integer.parseInt(req.getParameter("billingId"))); }
             catch (Exception e) { e.printStackTrace(); }
@@ -32,7 +32,7 @@ public class BillingServlet extends HttpServlet {
             return;
         }
 
-        // UPDATE STATUS — adjust bill
+        // Current status-adjusting the bill
         if ("updateStatus".equals(action)) {
             try {
                 int    id     = Integer.parseInt(req.getParameter("billingId"));
@@ -43,7 +43,7 @@ public class BillingServlet extends HttpServlet {
             return;
         }
 
-        // PROCESS NEW PAYMENT
+        // Processing a new paymennt
         String vehicleNo     = req.getParameter("vehicleNo");
         String hoursStr      = req.getParameter("hours");
         String paymentMethod = req.getParameter("paymentMethod");
@@ -53,7 +53,7 @@ public class BillingServlet extends HttpServlet {
             double amount = dao.calculateBill(hours);
             dao.saveBilling(new Billing(vehicleNo, amount, paymentMethod, "paid"));
             dao.recordExit(vehicleNo, amount);
-            // Pass details in URL so receipt can show them after redirect
+            // Riderecting to the receipt
             res.sendRedirect("billing?success=true"
                     + "&v=" + java.net.URLEncoder.encode(vehicleNo != null ? vehicleNo : "", "UTF-8")
                     + "&h=" + hours
