@@ -5,9 +5,8 @@ import java.util.*;
 
 public class ParkingLotDAO {
 
-    // ═══════════════════════════════════════
-    // VEHICLE ENTRY
-    // ═══════════════════════════════════════
+    
+    // Vehicle Entry
     public boolean recordEntry(String vehicleNo, int userId, int slotId) {
         String sql = "INSERT INTO parking_history (vehicle_no, user_id, slot_id, entry_time, payment_status) VALUES (?, ?, ?, NOW(), 'pending')";
         try (Connection conn = DBConnection.getConnection();
@@ -20,9 +19,7 @@ public class ParkingLotDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // ═══════════════════════════════════════
-    // VEHICLE EXIT
-    // ═══════════════════════════════════════
+    // Vehicle Exit
     public boolean recordExit(String vehicleNo, double totalFee) {
         String sql = "UPDATE parking_history SET exit_time=NOW(), duration=TIMESTAMPDIFF(HOUR,entry_time,NOW()), total_fee=?, payment_status='paid' WHERE vehicle_no=? AND exit_time IS NULL";
         try (Connection conn = DBConnection.getConnection();
@@ -34,14 +31,10 @@ public class ParkingLotDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // ═══════════════════════════════════════
-    // CALCULATE BILL — Rs.100 per hour
-    // ═══════════════════════════════════════
+    // Calculating the bill— Rs.100 per hour
     public double calculateBill(int hours) { return hours * 100.0; }
 
-    // ═══════════════════════════════════════
-    // SAVE BILLING
-    // ═══════════════════════════════════════
+    // Saving the Bill
     public void saveBilling(Billing billing) {
         String sql = "INSERT INTO payments (vehicle_no, amount, method, status) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -54,9 +47,7 @@ public class ParkingLotDAO {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // ═══════════════════════════════════════
-    // GET ALL BILLINGS
-    // ═══════════════════════════════════════
+    // Getting all the bills
     public List<Billing> getBillings() {
         List<Billing> list = new ArrayList<>();
         String sql = "SELECT * FROM payments ORDER BY id DESC";
@@ -72,9 +63,8 @@ public class ParkingLotDAO {
         return list;
     }
 
-    // ═══════════════════════════════════════
-    // DELETE BILLING — NEW
-    // ═══════════════════════════════════════
+    
+    // Delete Billing(new)
     public boolean deleteBilling(int id) {
         String sql = "DELETE FROM payments WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -84,10 +74,7 @@ public class ParkingLotDAO {
             return true;
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
-
-    // ═══════════════════════════════════════
     // UPDATE BILLING STATUS — NEW
-    // ═══════════════════════════════════════
     public boolean updateBillingStatus(int id, String status) {
         String sql = "UPDATE payments SET status=? WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -98,10 +85,8 @@ public class ParkingLotDAO {
             return true;
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
-
-    // ═══════════════════════════════════════
+    
     // SAVE FEEDBACK
-    // ═══════════════════════════════════════
     public void saveFeedback(Feedback feedback) {
         String sql = "INSERT INTO feedback (user_id, message, rating) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -113,9 +98,7 @@ public class ParkingLotDAO {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // ═══════════════════════════════════════
-    // GET ALL FEEDBACKS
-    // ═══════════════════════════════════════
+    // Getting all the feedbacks
     public List<Feedback> getFeedbacks() {
         List<Feedback> list = new ArrayList<>();
         String sql = "SELECT * FROM feedback ORDER BY id DESC";
@@ -131,9 +114,8 @@ public class ParkingLotDAO {
         return list;
     }
 
-    // ═══════════════════════════════════════
-    // DELETE FEEDBACK — NEW
-    // ═══════════════════════════════════════
+    
+    // Deleting feedback(new)
     public boolean deleteFeedback(int id) {
         String sql = "DELETE FROM feedback WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
