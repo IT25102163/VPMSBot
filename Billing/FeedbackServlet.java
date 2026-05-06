@@ -26,7 +26,7 @@ public class FeedbackServlet extends HttpServlet {
 
         String path = req.getServletPath();
 
-        // DELETE
+        // Delete
         if ("/deleteFeedback".equals(path)) {
             try { new ParkingLotDAO().deleteFeedback(Integer.parseInt(req.getParameter("feedbackId"))); }
             catch (Exception e) { e.printStackTrace(); }
@@ -34,7 +34,7 @@ public class FeedbackServlet extends HttpServlet {
             return;
         }
 
-        // UPDATE (edit) feedback message/rating
+        // Updating/Editing an existing feedback
         if ("/editFeedback".equals(path)) {
             try {
                 int    id      = Integer.parseInt(req.getParameter("feedbackId"));
@@ -49,7 +49,7 @@ public class FeedbackServlet extends HttpServlet {
                 ps.setInt   (3, id);
                 ps.executeUpdate();
                 conn.close();
-                // Clear edit session
+                // Clearing
                 req.getSession().removeAttribute("editFeedbackId");
                 req.getSession().removeAttribute("editFeedbackMsg");
                 req.getSession().removeAttribute("editFeedbackRating");
@@ -61,7 +61,7 @@ public class FeedbackServlet extends HttpServlet {
             return;
         }
 
-        // SUBMIT NEW FEEDBACK
+        // Submitting the new feedback
         try {
             int userId = Integer.parseInt(req.getParameter("userId"));
             int rating = Integer.parseInt(req.getParameter("rating"));
