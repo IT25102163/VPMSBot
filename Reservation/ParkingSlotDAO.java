@@ -7,19 +7,10 @@ import java.util.List;
 import java.sql.*;
 import java.util.*;
 
-    /**
-     * ParkingSlotDAO
-     * YOUR LEADER SAID: This shows customers the slot GRID
-     * - Get all slots (for the visual grid)
-     * - Update slot status (available/occupied/reserved)
-     * - Get available slots only
-     */
+    
     public class ParkingSlotDAO {
 
-        // ═══════════════════════════════════════
-        // GET ALL SLOTS — for the visual grid
-        // Used by view-slots.jsp to show all slots
-        // ═══════════════════════════════════════
+      
         public List<ParkingSlot> getAllSlots() {
             List<ParkingSlot> list = new ArrayList<>();
             String sql = "SELECT * FROM parking_slots ORDER BY slot_name";
@@ -41,10 +32,7 @@ import java.util.*;
             return list;
         }
 
-        // ═══════════════════════════════════════
-        // GET AVAILABLE SLOTS ONLY
-        // Used when a vehicle needs to be assigned a slot
-        // ═══════════════════════════════════════
+        
         public List<ParkingSlot> getAvailableSlots() {
             List<ParkingSlot> list = new ArrayList<>();
             String sql = "SELECT * FROM parking_slots WHERE status = 'Available' ORDER BY slot_name";
@@ -66,11 +54,7 @@ import java.util.*;
             return list;
         }
 
-        // ═══════════════════════════════════════
-        // UPDATE SLOT STATUS
-        // Called when vehicle enters (set Occupied)
-        // or exits (set Available)
-        // ═══════════════════════════════════════
+        
         public boolean updateSlotStatus(int slotId, String status) {
             String sql = "UPDATE parking_slots SET status = ? WHERE slot_id = ?";
             try (Connection conn = DBConnection.getConnection();
@@ -85,9 +69,7 @@ import java.util.*;
             }
         }
 
-        // ═══════════════════════════════════════
-        // GET SLOT BY ID
-        // ═══════════════════════════════════════
+        
         public ParkingSlot getSlotById(int slotId) {
             String sql = "SELECT * FROM parking_slots WHERE slot_id = ?";
             try (Connection conn = DBConnection.getConnection();
@@ -109,10 +91,7 @@ import java.util.*;
             return null;
         }
 
-        // ═══════════════════════════════════════
-        // COUNT FREE SLOTS
-        // Used on dashboard to show number available
-        // ═══════════════════════════════════════
+        
         public int countFreeSlots() {
             String sql = "SELECT COUNT(*) FROM parking_slots WHERE status = 'Available'";
             try (Connection conn = DBConnection.getConnection();
