@@ -3,16 +3,12 @@ package Parking;
 
 
 
-    /**
-     * ParkingSlot.java
-     * Updated to include slotName (e.g. "A01", "B02")
-     * which is needed by ParkingSlotDAO and view-slots.jsp
-     */
+    
     public class ParkingSlot {
 
         private int    slotId;
-        private String slotName;   // e.g. "A01", "B02"
-        private String status;     // "Available", "Occupied", "Reserved"
+        private String slotName;   
+        private String status;     
         private int    floor;
 
         public ParkingSlot(int slotId, String status, int floor) {
