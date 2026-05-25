@@ -10,14 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * SlotServlet.java — FULLY DATABASE DRIVEN
- * No more hardcoded lists!
- * GET  /slots           → reads ALL slots from parking_slots table
- * POST /slots add       → inserts new slot into DB
- * POST /slots update    → updates slot status in DB (green/yellow/red)
- * POST /slots delete    → deletes slot from DB
- */
+
 @WebServlet("/slots")
 public class SlotServlet extends HttpServlet {
 
